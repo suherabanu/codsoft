@@ -1,0 +1,94 @@
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
+import java.util.Timer;
+import java.util.TimerTask;
+
+class Question {
+    String questionText;
+    List<String> options;
+    int correctOption;
+
+    public Question(String questionText, List<String> options, int correctOption) {
+        this.questionText = questionText;
+        this.options = options;
+        this.correctOption = correctOption;
+    }
+}
+
+public class QuizApplication {
+    private List<Question> questions;
+    private int currentQuestionIndex;
+    private int score;
+    private Timer timer;
+    private static final int TIME_LIMIT = 30; // Time limit for each question in seconds
+
+    public QuizApplication() {
+        questions = new ArrayList<>();
+        // Add your questions and options here
+        questions.add(new Question("What is the capital of France?", List.of("London", "Berlin", "Paris", "Madrid"), 2));
+        // Add more questions...
+
+        currentQuestionIndex = 0;
+        score = 0;
+        timer = new Timer();
+    }
+
+    public void startQuiz() {
+        displayQuestion();
+    }
+
+    public void displayQuestion() {
+        if (currentQuestionIndex < questions.size()) {
+            Question currentQuestion = questions.get(currentQuestionIndex);
+            System.out.println(currentQuestion.questionText);
+            for (int i = 0; i < currentQuestion.options.size(); i++) {
+                System.out.println((i + 1) + ". " + currentQuestion.options.get(i));
+            }
+
+            setTimer();
+            getUserAnswer();
+        } else {
+            endQuiz();
+        }
+    }
+
+    public void setTimer() {
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                System.out.println("Time's up!");
+                currentQuestionIndex++;
+                displayQuestion();
+            }
+        }, TIME_LIMIT * 1000);
+    }
+
+    public void getUserAnswer() {
+        Scanner scanner = new Scanner(System.in);
+        int selectedOption = scanner.nextInt();
+
+        Question currentQuestion = questions.get(currentQuestionIndex);
+        if (selectedOption == currentQuestion.correctOption) {
+            System.out.println("Correct!");
+            score++;
+        } else {
+            System.out.println("Incorrect. The correct answer was: " + currentQuestion.correctOption);
+        }
+
+        currentQuestionIndex++;
+        displayQuestion();
+    }
+
+    public void endQuiz() {
+        System.out.println("Quiz completed!");
+        System.out.println("Your score: " + score + "/" + questions.size());
+        // Display correct/incorrect answers summary here
+        System.exit(0);
+    }
+
+    public static void main(String[] args) {
+        QuizApplication quizApp = new QuizApplication();
+        quizApp.startQuiz();
+    }
+}
